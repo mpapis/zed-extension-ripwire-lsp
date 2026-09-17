@@ -59,7 +59,9 @@ docker commit ripwire-bake leap-build:wasip2
 docker rm -f ripwire-bake
 ```
 
-Then build, check, and update the committed artifact:
+Then build, check, and update the committed artifact. `RUSTFLAGS` normalizes the
+absolute source paths that dependency panic locations embed, which is what makes the
+artifact byte-reproducible across machines (and keeps your home directory out of it):
 
 ```sh
 docker run --rm -u 1000:1000 -e HOME=/tmp \
@@ -67,28 +69,32 @@ docker run --rm -u 1000:1000 -e HOME=/tmp \
   -e PATH=/opt/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
   -v "$HOME/.cache/leap-cargo:/tmp/cargo:z" -v "$PWD:$PWD:z" -w "$PWD" \
   leap-build:wasip2 sh -c '
+    export RUSTFLAGS="--remap-path-prefix=$CARGO_HOME=/cargo --remap-path-prefix=$PWD=/src"
     cargo fmt --check &&
     cargo clippy --release --target wasm32-wasip2 -- -D warnings &&
     cargo build --release --target wasm32-wasip2 &&
     cp target/wasm32-wasip2/release/zed_extension_ripwire_lsp.wasm extension.wasm'
 ```
 
-(On SELinux hosts the `:z` mount suffix is required.)
+(On SELinux hosts the `:z` mount suffix is required. CI applies the equivalent remaps
+via `$CARGO_HOME` and `$PWD` on the runner.)
 
 ### Reproducibility
 
-The committed `extension.wasm` is byte-reproducible **with this exact recipe**: rust
-1.98.0 (official rustup builds, `88d9e12ae 2026-08-18`), target `wasm32-wasip2`, built
-from the committed `Cargo.lock`. Clean rebuilds in the pinned toolchain have produced
-identical bytes, including from scratch with a different target directory:
+The committed `extension.wasm` is byte-reproducible: rust 1.98.0 (official rustup
+builds, `88d9e12ae 2026-08-18`), target `wasm32-wasip2`, committed `Cargo.lock`, and
+the path-remapping `RUSTFLAGS` above. Verified across environments: identical bytes
+from an openSUSE Leap 16.0 container and from GitHub Actions runners. Without the
+remaps, dependency panic locations embed absolute paths and the artifact differs per
+machine — if you change the build environment, keep the remaps.
 
 ```text
-sha256  6fe6f352ec7470dc9bafb48c9323fdfffb853937339593e4f3f5958df4cc4b04
+sha256  d30681ff5862c00779d4cfc8334be22a7eccbffde971a0975319102f8b350848
 ```
 
-Byte equality across *different* toolchain versions or non-rustup distributions is not
-claimed. If you rebuild with a different compiler you may get a different artifact.
-CI rebuilds with the pinned toolchain and fails if the artifact drifts.
+CI rebuilds with the pinned toolchain and fails if the artifact drifts. Byte equality
+across *different* rustc versions is not claimed; if you bump the toolchain, rebuild
+and recommit the artifact in the same commit.
 
 ## Honest floors
 
