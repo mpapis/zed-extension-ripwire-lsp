@@ -104,7 +104,9 @@ until a Rust-literate review lands. `cargo fmt`/`clippy -D warnings` pass; the s
 one trait implementation.
 
 Issues: open them on this repository. Upstream ripwire issues belong to
-[redhat-et/ripwire](https://github.com/redhat-et/ripwire).
+[redhat-et/ripwire](https://github.com/redhat-et/ripwire). Security reports: use GitHub's
+private vulnerability disclosure on this repository
+(Security tab → "Report a vulnerability").
 
 ## License
 
