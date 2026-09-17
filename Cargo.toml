@@ -1,7 +1,9 @@
 [package]
-name = "ripwire-zed-extension"
+name = "zed-extension-ripwire-lsp"
 version = "0.1.0"
 edition = "2021"
+description = "Zed extension registering the ripwire --lsp read-only whole-tree language server"
+license = "Apache-2.0"
 
 [lib]
 crate-type = ["cdylib"]

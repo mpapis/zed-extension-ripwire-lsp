@@ -1,8 +1,8 @@
 use zed_extension_api::{self as zed, LanguageServerId, Result, Worktree};
 
-struct Ripwire;
+struct RipwireLsp;
 
-impl zed::Extension for Ripwire {
+impl zed::Extension for RipwireLsp {
     fn new() -> Self {
         Self
     }
@@ -12,10 +12,17 @@ impl zed::Extension for Ripwire {
         _language_server_id: &LanguageServerId,
         worktree: &Worktree,
     ) -> Result<zed::Command> {
-        // The settings override (lsp.ripwire-lsp.binary) wins when present; otherwise ripwire must
-        // be on PATH. No hardcoded dev tree - a shared extension should tell you what to fix.
-        let path = worktree.which("ripwire").ok_or_else(|| {
-            "ripwire is not on PATH; set lsp.ripwire-lsp.binary.path in Zed settings to the ripwire binary (>= 0.6.1, built with --lsp)"
+        // Resolution order: RIPWIRE_PATH from the user's shell environment, then `ripwire` on
+        // PATH. Zed's settings override (lsp.ripwire-lsp.binary.path) still wins over both, since
+        // Zed consults it before asking the extension. std::env is not available in the wasm
+        // sandbox, so the shell environment is read through the worktree API.
+        let from_env = worktree
+            .shell_env()
+            .into_iter()
+            .find(|(key, value)| key == "RIPWIRE_PATH" && !value.is_empty())
+            .map(|(_, value)| value);
+        let path = from_env.or_else(|| worktree.which("ripwire")).ok_or_else(|| {
+            "ripwire is not on PATH and RIPWIRE_PATH is not set; set lsp.ripwire-lsp.binary.path in Zed settings to the ripwire binary (>= 0.6.1, provides --lsp)"
                 .to_string()
         })?;
         Ok(zed::Command {
@@ -26,4 +33,4 @@ impl zed::Extension for Ripwire {
     }
 }
 
-zed::register_extension!(Ripwire);
+zed::register_extension!(RipwireLsp);
