@@ -13,6 +13,8 @@ jobs:
         with:
           targets: wasm32-wasip2
           components: rustfmt, clippy
+      - name: Normalize embedded source paths
+        run: echo "RUSTFLAGS=--remap-path-prefix=$CARGO_HOME=/cargo --remap-path-prefix=$PWD=/src" >> "$GITHUB_ENV"
       - run: cargo fmt --check
       - run: cargo clippy --release --target wasm32-wasip2 -- -D warnings
       - run: cargo build --release --target wasm32-wasip2
