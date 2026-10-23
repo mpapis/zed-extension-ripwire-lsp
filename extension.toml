@@ -8,4 +8,29 @@ repository = "https://github.com/mpapis/zed-extension-ripwire-lsp"
 
 [language_servers.ripwire-lsp]
 name = "Ripwire"
-languages = ["C++", "C", "Python", "Shell Script", "Markdown", "JavaScript", "TypeScript", "TSX", "JSON", "YAML", "Rust", "Java", "Elixir", "Ruby"]
+languages = [
+  "C++",
+  "C",
+  "Python",
+  "Shell Script",
+  "Markdown",
+  "JavaScript",
+  "TypeScript",
+  "TSX",
+  "JSON",
+  "YAML",
+  "Rust",
+  "Java",
+  "Elixir",
+  "Ruby",
+  "Go",
+  "PHP",
+  "Lua",
+  "Dart",
+  "Kotlin",
+  "Swift",
+  "CSharp",
+  "GDScript",
+  "TOML",
+  "Astro",
+]

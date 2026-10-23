@@ -10,7 +10,14 @@ Registers [ripwire](https://github.com/redhat-et/ripwire)'s `--lsp` stdio server
 - hover
 
 Supported languages: C, C++, Python, Shell Script, Markdown, JavaScript, TypeScript,
-TSX, JSON, YAML, Rust, Java, Elixir, Ruby.
+TSX, JSON, YAML, Rust, Java, Elixir, Ruby, Go, PHP, Lua, Dart, Kotlin, Swift, C#,
+GDScript, TOML, Astro.
+
+The `languages` list in `extension.toml` uses Zed's canonical language names, which is
+why C# appears as `CSharp`. Coverage caveats inherited from ripwire: Godot means `.gd`
+only (`.tscn`, `.tres` and `.gdshader` are not indexed); Astro means frontmatter only.
+Objective-C/Objective-C++, Metal and CUDA are parsed by ripwire but are not registered
+here, because Zed has no built-in language name to bind them to.
 
 This extension does **not** bundle ripwire. It only resolves a ripwire binary already on
 your machine and starts it with `--lsp`.
